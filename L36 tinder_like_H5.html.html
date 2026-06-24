@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<script type="text/javascript" src="https://127.0.0.1:50000/brpid/12876"></script><script type="text/javascript" charset="utf-8" src="https://127.0.0.1:50000/bundle.js?266493328"></script></head>
+<body>
+<x-dc>
+<helmet>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#eceff1;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;color:#2b2b2b;-webkit-font-smoothing:antialiased;}
+@keyframes danmu{0%{transform:translateX(300px);}100%{transform:translateX(-105%);}}
+</style>
+</helmet>
+
+<div style="max-width:1200px;margin:0 auto;padding:0 24px 80px">
+
+<div style="text-align:center;padding:42px 20px 6px">
+<div style="font-size:27px;font-weight:800;color:#1a1a2e;letter-spacing:.5px">H5 方案 · Tinder</div>
+<div style="font-size:13px;color:#666;margin-top:9px">逆水寒 NA/SEA「暧昧加载，请勿退出」｜ 月老 · 江湖红线 · Ship or Swipe ｜ PRD v0.1（草案）</div>
+<div style="display:inline-flex;gap:8px;margin-top:14px;flex-wrap:wrap;justify-content:center">
+<div style="font-size:11px;color:#2a6fdb;background:#e9f0fc;border:1px solid #c5d8f5;border-radius:12px;padding:4px 12px">蓝 = 主操作 / 选中</div>
+<div style="font-size:11px;color:#e0571f;background:#fdeee7;border:1px solid #f6cbb6;border-radius:12px;padding:4px 12px">橙 = 核心模块 / 改造点</div>
+<div style="font-size:11px;color:#666;background:#f1f1f1;border:1px solid #ddd;border-radius:12px;padding:4px 12px">⊠ = 游戏内快照占位（无真人照）</div>
+</div>
+</div>
+
+<!-- ============ S1 核心机制总览 ============ -->
+<div style="margin-top:36px;padding-top:24px;text-align:center">
+<div style="font-size:22px;font-weight:800;color:#1a1a2e">一、核心机制总览</div>
+<div style="font-size:13px;color:#666;margin-top:6px">建档 3 天 → 匹配 7 天 → 后续滚动；定位是<b>社交叙事活动</b>，不是交友工具。</div>
+</div>
+
+<div style="display:flex;gap:14px;align-items:stretch;max-width:1040px;margin:24px auto 0;flex-wrap:wrap;justify-content:center">
+<div style="flex:1;min-width:230px;border:1.5px solid #d8d8d8;border-radius:16px;background:#fff;padding:18px">
+<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="display:inline-flex;width:24px;height:24px;border-radius:50%;background:#e7ecf6;color:#2a6fdb;font-size:13px;font-weight:800;align-items:center;justify-content:center">1</span><span style="font-weight:800;font-size:15px;color:#222">建档</span><span style="font-size:11px;color:#999;margin-left:auto">D1–D3</span></div>
+<div style="font-size:12.5px;color:#555;line-height:1.7">校验准入 → 选游戏内快照 → 选意向/标签 → 写暧昧宣言</div>
+<div style="margin-top:10px;font-size:11.5px;color:#2a6fdb;background:#f3f7fe;border-radius:8px;padding:7px 10px">产出钩子：沉淀匹配池 + 暧昧上墙造势</div>
+</div>
+<div style="display:flex;align-items:center;color:#c4c4c4;font-size:24px;font-weight:300">→</div>
+<div style="flex:1;min-width:230px;border:1.5px solid #d8d8d8;border-radius:16px;background:#fff;padding:18px">
+<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="display:inline-flex;width:24px;height:24px;border-radius:50%;background:#e7ecf6;color:#2a6fdb;font-size:13px;font-weight:800;align-items:center;justify-content:center">2</span><span style="font-weight:800;font-size:15px;color:#222">匹配</span><span style="font-size:11px;color:#999;margin-left:auto">D4–D10</span></div>
+<div style="font-size:12.5px;color:#555;line-height:1.7">Tinder 式滑卡：右滑 ship / 左滑 skip</div>
+<div style="margin-top:10px;font-size:11.5px;color:#2a6fdb;background:#f3f7fe;border-radius:8px;padding:7px 10px">产出钩子：牵线成功（自牵成 / 月老保底）人人有线</div>
+</div>
+<div style="display:flex;align-items:center;color:#c4c4c4;font-size:24px;font-weight:300">→</div>
+<div style="flex:1;min-width:230px;border:1.5px solid #d8d8d8;border-radius:16px;background:#fff;padding:18px">
+<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="display:inline-flex;width:24px;height:24px;border-radius:50%;background:#e7ecf6;color:#2a6fdb;font-size:13px;font-weight:800;align-items:center;justify-content:center">3</span><span style="font-weight:800;font-size:15px;color:#222">后续</span><span style="font-size:11px;color:#999;margin-left:auto">滚动</span></div>
+<div style="font-size:12.5px;color:#555;line-height:1.7">CP 进契约副本；个人看心动报告</div>
+<div style="margin-top:10px;font-size:11.5px;color:#2a6fdb;background:#f3f7fe;border-radius:8px;padding:7px 10px">产出钩子：端内回流 + 付费 + 分享裂变</div>
+</div>
+</div>
+
+<div style="max-width:1040px;margin:14px auto 0;border:2px dashed #cdcdcd;border-radius:14px;background:#fafafa;padding:14px 18px">
+<div style="font-size:12.5px;color:#555;line-height:1.7"><b style="color:#333">旁路 · 吃瓜 / 磕 CP 层（全程开放）</b>　不必自己上场——围观红线榜、匿名磕 CP、投票，接「吃瓜 live 现场」概念，也是匹配池稀薄时的体验兜底。</div>
+</div>
+
+<!-- ============ S2 阶段零 准入 ============ -->
+<div style="border-top:3px solid #1a1a2e;margin-top:50px;padding-top:24px;text-align:center">
+<div style="font-size:22px;font-weight:800;color:#1a1a2e">二、阶段零 · 准入与游戏内数据回传 <span style="color:#e0571f">★</span></div>
+<div style="font-size:13px;color:#666;margin-top:6px">进入建档前强制走一次游戏服务端回调，一次性拉全字段。核心目的：挡掉小号 / 水号，避免污染匹配池。</div>
+</div>
+
+<div style="font-size:16px;font-weight:800;color:#1a1a2e;border-left:4px solid #ff5722;padding-left:12px;margin:30px 0 6px">2.1 准入校验 — 角色等级 ≥ 50</div>
+<div style="font-size:13px;color:#666;line-height:1.7;padding-left:16px;margin-bottom:20px">通过则进入建档；低于门槛则拦截，引导继续游戏 / 升级（顺势做端内导流）。门槛数值待定。</div>
+
+<div style="display:flex;gap:32px;flex-wrap:wrap;justify-content:center;align-items:flex-start">
+
+<div style="display:flex;flex-direction:column;align-items:center">
+<div style="background:#1a1a2e;color:#fff;padding:7px 16px;border-radius:16px;font-size:12.5px;font-weight:600;margin-bottom:8px">状态A：达标 — 通过态</div>
+<div style="font-size:11.5px;color:#777;margin-bottom:10px;max-width:300px;text-align:center">已达门槛，可进入建档</div>
+<div style="width:330px;background:#fff;border:2px solid #2f2f33;border-radius:30px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.12)">
+<div style="width:120px;height:22px;background:#2f2f33;margin:0 auto;border-radius:0 0 13px 13px"></div>
+<div style="min-height:560px;display:flex;flex-direction:column;padding-bottom:18px">
+<div style="text-align:center;font-size:12px;color:#999;letter-spacing:1px;padding:18px 16px 2px">月老 · 江湖红线</div>
+<div style="text-align:center;font-size:20px;font-weight:800;color:#222;padding:4px 16px 18px">暧昧加载，请勿退出</div>
+<div style="margin:0 20px;border:1px solid #e2e2e2;border-radius:14px;background:#fafafa;padding:30px 16px;text-align:center">
+<div style="font-size:34px;color:#c4c4c4;line-height:1;margin-bottom:14px">⊠</div>
+<div style="font-size:15px;font-weight:700;color:#333">检测角色等级 Lv.58</div>
+<div style="font-size:12px;color:#2e9e5b;margin-top:6px;font-weight:600">已达 Lv.50 · 通过</div>
+</div>
+<div style="text-align:center;font-size:11.5px;color:#999;margin-top:14px;padding:0 20px">需 Lv.50+，挡水号污染池子</div>
+<div style="flex:1"></div>
+<div style="margin:16px 20px 0;border:1.5px solid #2a6fdb;border-radius:12px;color:#2a6fdb;font-weight:700;text-align:center;padding:13px;font-size:14px">进入建档</div>
+</div>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;align-items:center">
+<div style="background:#1a1a2e;color:#fff;padding:7px 16px;border-radius:16px;font-size:12.5px;font-weight:600;margin-bottom:8px">状态B：未达 50 级 — 拦截态</div>
+<div style="font-size:11.5px;color:#777;margin-bottom:10px;max-width:300px;text-align:center">拦截并导流回游戏升级</div>
+<div style="width:330px;background:#fff;border:2px solid #2f2f33;border-radius:30px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.12)">
+<div style="width:120px;height:22px;background:#2f2f33;margin:0 auto;border-radius:0 0 13px 13px"></div>
+<div style="min-height:560px;display:flex;flex-direction:column;padding-bottom:18px">
+<div style="text-align:center;font-size:12px;color:#999;letter-spacing:1px;padding:18px 16px 2px">月老 · 江湖红线</div>
+<div style="text-align:center;font-size:20px;font-weight:800;color:#222;padding:4px 16px 18px">暧昧加载，请勿退出</div>
+<div style="margin:0 20px 0;display:flex;justify-content:center"><span style="display:inline-block;font-size:11px;font-weight:700;color:#8a8a8a;background:#efefef;border:1px solid #ddd;border-radius:10px;padding:3px 10px">拦截态</span></div>
+<div style="margin:12px 20px 0;border:1px solid #ead6d0;border-radius:14px;background:#fbf3f0;padding:30px 16px;text-align:center">
+<div style="font-size:34px;color:#cdb4ab;line-height:1;margin-bottom:14px">⊠</div>
+<div style="font-size:15px;font-weight:700;color:#333">检测角色等级 Lv.42</div>
+<div style="font-size:12px;color:#c2502c;margin-top:6px;font-weight:600">未达 Lv.50 · 拦截</div>
+</div>
+<div style="text-align:center;font-size:11.5px;color:#999;margin-top:14px;padding:0 20px;line-height:1.6">角色等级未达门槛，<br>升到 Lv.50 即可建档参与</div>
+<div style="flex:1"></div>
+<div style="margin:16px 20px 0;background:#2a6fdb;border-radius:12px;color:#fff;font-weight:700;text-align:center;padding:13px;font-size:14px">继续游戏升级 →</div>
+<div style="text-align:center;font-size:11px;color:#999;margin-top:10px">还没下载？前往下载 / 打开游戏</div>
+</div>
+</div>
+</div>
+
+</div>
+
+<!-- 字段说明 spec -->
+<div style="max-width:760px;margin:30px auto 0;background:#fff;border-radius:12px;border:1px solid #e3e3e3;border-left:4px solid #ff5722;box-shadow:0 2px 10px rgba(0,0,0,.05);overflow:hidden">
+<div style="padding:14px 20px 4px;font-size:14px;font-weight:800;color:#1a1a2e">回传字段（H5 ← 游戏服务端）</div>
+<div style="padding:6px 20px 16px">
+<div style="display:grid;grid-template-columns:140px 1fr;gap:0;font-size:12.5px">
+<div style="padding:9px 0;border-bottom:1px solid #f0f0f0;font-weight:700;color:#333">角色ID / 区服</div><div style="padding:9px 0;border-bottom:1px solid #f0f0f0;color:#666">唯一身份、防多开 · 一号一档</div>
+<div style="padding:9px 0;border-bottom:1px solid #f0f0f0;font-weight:700;color:#333">角色等级</div><div style="padding:9px 0;border-bottom:1px solid #f0f0f0;color:#666">准入门槛 ≥ 50，&lt;50 拦截</div>
+<div style="padding:9px 0;border-bottom:1px solid #f0f0f0;font-weight:700;color:#333">成年状态 / 年龄段</div><div style="padding:9px 0;border-bottom:1px solid #f0f0f0;color:#666">轨道路由（未成年仅搭子线）· <span style="color:#e0571f">★ 海外取数待确认</span></div>
+<div style="padding:9px 0;border-bottom:1px solid #f0f0f0;font-weight:700;color:#333">性别 / 阵营 / 门派</div><div style="padding:9px 0;border-bottom:1px solid #f0f0f0;color:#666">卡片展示 + 弱匹配权重</div>
+<div style="padding:9px 0;border-bottom:1px solid #f0f0f0;font-weight:700;color:#333">最近活跃时段</div><div style="padding:9px 0;border-bottom:1px solid #f0f0f0;color:#666">匹配权重（同时段更易组队）</div>
+<div style="padding:9px 0;font-weight:700;color:#333">角色形象快照 URL</div><div style="padding:9px 0;color:#666">头像（仅游戏内出图，<b>不开放真人照上传</b>）</div>
+</div>
+</div>
+</div>
+
+<div style="max-width:760px;margin:14px auto 0;border:2px dashed #f6cbb6;border-radius:12px;background:#fdf6f2;padding:14px 18px">
+<div style="font-size:12.5px;color:#7a5a4a;line-height:1.8"><b style="color:#c2502c">头像与轨道</b>　头像仅来源于游戏内快照（拍照 / 捏脸 / 角色立绘），不开放真人照或外部图片上传。<b>未成年仅进搭子线</b>，不进入恋爱匹配池——该路由依赖成年状态字段，海外取数是必须先落实的前置条件。</div>
+</div>
+
+</div>
+
+<div style="max-width:1200px;margin:0 auto;padding:0 24px 40px">
+
+<!-- ============ S3 阶段一 建档 ============ -->
+<div style="border-top:3px solid #1a1a2e;margin-top:50px;padding-top:24px;text-align:center">
+<div style="font-size:22px;font-weight:800;color:#1a1a2e">三、阶段一 · 建档期（D1–D3）</div>
+<div style="font-size:13px;color:#666;margin-top:6px">选游戏内快照 → 选交友意向 / 标签 → 写暧昧宣言；双轨设计对冲 MMO 男多女少导致的恋爱池塌方。</div>
+</div>
+
+<div style="font-size:16px;font-weight:800;color:#1a1a2e;border-left:4px solid #ff5722;padding-left:12px;margin:30px 0 6px">3.1 建档表单 — 双轨 + 宣言模板</div>
+<div style="font-size:13px;color:#666;line-height:1.7;padding-left:16px;margin-bottom:20px">交友意向单选（恋爱线 / 搭子线，决定进哪个匹配池）；标签多选 ≤5，预设标签池不开放自由输入（控审核）；宣言限字数 + 敏感词过滤。</div>
+
+<div style="display:flex;gap:32px;flex-wrap:wrap;justify-content:center;align-items:flex-start">
+
+<!-- 恋爱线 -->
+<div style="display:flex;flex-direction:column;align-items:center">
+<div style="background:#1a1a2e;color:#fff;padding:7px 16px;border-radius:16px;font-size:12.5px;font-weight:600;margin-bottom:8px">状态A：恋爱线态</div>
+<div style="font-size:11.5px;color:#777;margin-bottom:10px;max-width:300px;text-align:center">成年玩家 · 进入恋爱匹配池</div>
+<div style="width:330px;background:#fff;border:2px solid #2f2f33;border-radius:30px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.12)">
+<div style="width:120px;height:22px;background:#2f2f33;margin:0 auto;border-radius:0 0 13px 13px"></div>
+<div style="min-height:620px;display:flex;flex-direction:column;padding-bottom:18px">
+<div style="font-size:13px;font-weight:800;color:#222;padding:16px 20px 0">建档</div>
+<div style="font-size:12.5px;color:#555;font-weight:600;margin:14px 20px 8px">头像 · 游戏内快照（无真人照）</div>
+<div style="display:flex;gap:10px;padding:0 20px">
+<div style="width:62px;height:62px;border-radius:12px;border:2px solid #2a6fdb;background:#f3f7fe;display:flex;align-items:center;justify-content:center;font-size:22px;color:#2a6fdb">⊠</div>
+<div style="width:62px;height:62px;border-radius:12px;border:1px solid #ddd;background:#fafafa;display:flex;align-items:center;justify-content:center;font-size:22px;color:#c4c4c4">⊠</div>
+<div style="width:62px;height:62px;border-radius:12px;border:1px solid #ddd;background:#fafafa;display:flex;align-items:center;justify-content:center;font-size:22px;color:#c4c4c4">⊠</div>
+<div style="width:62px;height:62px;border-radius:12px;border:1px solid #ddd;background:#fafafa;display:flex;align-items:center;justify-content:center;font-size:22px;color:#c4c4c4">⊠</div>
+</div>
+<div style="font-size:12.5px;color:#555;font-weight:600;margin:18px 20px 8px">交友意向</div>
+<div style="display:flex;margin:0 20px;border:1px solid #d8d8d8;border-radius:12px;overflow:hidden;font-size:13px">
+<div style="flex:1;text-align:center;padding:11px;background:#e9f0fc;color:#2a6fdb;font-weight:700">恋爱线</div>
+<div style="flex:1;text-align:center;padding:11px;color:#666">搭子线</div>
+</div>
+<div style="font-size:12.5px;color:#555;font-weight:600;margin:18px 20px 8px">标签（≤5）</div>
+<div style="display:flex;flex-wrap:wrap;gap:8px;padding:0 20px">
+<span style="border:1px solid #2a6fdb;color:#2a6fdb;background:#f3f7fe;border-radius:14px;padding:6px 13px;font-size:12px">作息党</span>
+<span style="border:1px solid #2a6fdb;color:#2a6fdb;background:#f3f7fe;border-radius:14px;padding:6px 13px;font-size:12px">同玩法</span>
+<span style="border:1px solid #2a6fdb;color:#2a6fdb;background:#f3f7fe;border-radius:14px;padding:6px 13px;font-size:12px">CP向</span>
+<span style="border:1px solid #d8d8d8;color:#444;border-radius:14px;padding:6px 13px;font-size:12px">找固定队</span>
+</div>
+<div style="font-size:12.5px;color:#555;font-weight:600;margin:18px 20px 8px">暧昧宣言</div>
+<div style="margin:0 20px;border:1px solid #d8d8d8;border-radius:10px;padding:12px;font-size:13px;color:#aaa">写一句… 或「套用模板」</div>
+<div style="flex:1"></div>
+<div style="margin:18px 20px 0;border:1.5px solid #2a6fdb;border-radius:12px;color:#2a6fdb;font-weight:700;text-align:center;padding:13px;font-size:14px">进入匹配池</div>
+</div>
+</div>
+</div>
+
+<!-- 搭子线 -->
+<div style="display:flex;flex-direction:column;align-items:center">
+<div style="background:#1a1a2e;color:#fff;padding:7px 16px;border-radius:16px;font-size:12.5px;font-weight:600;margin-bottom:8px">状态B：搭子线态</div>
+<div style="font-size:11.5px;color:#777;margin-bottom:10px;max-width:300px;text-align:center">未成年仅此线 · 纯柏拉图，不进恋爱池</div>
+<div style="width:330px;background:#fff;border:2px solid #2f2f33;border-radius:30px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.12)">
+<div style="width:120px;height:22px;background:#2f2f33;margin:0 auto;border-radius:0 0 13px 13px"></div>
+<div style="min-height:620px;display:flex;flex-direction:column;padding-bottom:18px">
+<div style="font-size:13px;font-weight:800;color:#222;padding:16px 20px 0">建档</div>
+<div style="font-size:12.5px;color:#555;font-weight:600;margin:14px 20px 8px">头像 · 游戏内快照（无真人照）</div>
+<div style="display:flex;gap:10px;padding:0 20px">
+<div style="width:62px;height:62px;border-radius:12px;border:2px solid #2a6fdb;background:#f3f7fe;display:flex;align-items:center;justify-content:center;font-size:22px;color:#2a6fdb">⊠</div>
+<div style="width:62px;height:62px;border-radius:12px;border:1px solid #ddd;background:#fafafa;display:flex;align-items:center;justify-content:center;font-size:22px;color:#c4c4c4">⊠</div>
+<div style="width:62px;height:62px;border-radius:12px;border:1px solid #ddd;background:#fafafa;display:flex;align-items:center;justify-content:center;font-size:22px;color:#c4c4c4">⊠</div>
+<div style="width:62px;height:62px;border-radius:12px;border:1px solid #ddd;background:#fafafa;display:flex;align-items:center;justify-content:center;font-size:22px;color:#c4c4c4">⊠</div>
+</div>
+<div style="font-size:12.5px;color:#555;font-weight:600;margin:18px 20px 8px">交友意向</div>
+<div style="display:flex;margin:0 20px;border:1px solid #d8d8d8;border-radius:12px;overflow:hidden;font-size:13px">
+<div style="flex:1;text-align:center;padding:11px;color:#666">恋爱线</div>
+<div style="flex:1;text-align:center;padding:11px;background:#e9f0fc;color:#2a6fdb;font-weight:700">搭子线</div>
+</div>
+<div style="font-size:12.5px;color:#555;font-weight:600;margin:18px 20px 8px">标签（≤5）</div>
+<div style="display:flex;flex-wrap:wrap;gap:8px;padding:0 20px">
+<span style="border:1px solid #2a6fdb;color:#2a6fdb;background:#f3f7fe;border-radius:14px;padding:6px 13px;font-size:12px">同玩法</span>
+<span style="border:1px solid #2a6fdb;color:#2a6fdb;background:#f3f7fe;border-radius:14px;padding:6px 13px;font-size:12px">找固定队</span>
+<span style="border:1px solid #2a6fdb;color:#2a6fdb;background:#f3f7fe;border-radius:14px;padding:6px 13px;font-size:12px">语音队</span>
+<span style="border:1px solid #d8d8d8;color:#444;border-radius:14px;padding:6px 13px;font-size:12px">作息党</span>
+</div>
+<div style="font-size:12.5px;color:#555;font-weight:600;margin:18px 20px 8px">搭子宣言</div>
+<div style="margin:0 20px;border:1px solid #d8d8d8;border-radius:10px;padding:12px;font-size:13px;color:#aaa">在线蹲一个一起钓鱼的…</div>
+<div style="margin:10px 20px 0;font-size:10.5px;color:#999;background:#f4f4f4;border-radius:8px;padding:7px 10px">搭子线为纯柏拉图，不进入恋爱弹幕墙</div>
+<div style="flex:1"></div>
+<div style="margin:14px 20px 0;border:1.5px solid #2a6fdb;border-radius:12px;color:#2a6fdb;font-weight:700;text-align:center;padding:13px;font-size:14px">进入搭子池</div>
+</div>
+</div>
+</div>
+
+<!-- 宣言模板 -->
+<div style="display:flex;flex-direction:column;align-items:center">
+<div style="background:#1a1a2e;color:#fff;padding:7px 16px;border-radius:16px;font-size:12.5px;font-weight:600;margin-bottom:8px">状态C：宣言模板态</div>
+<div style="font-size:11.5px;color:#777;margin-bottom:10px;max-width:300px;text-align:center">一键套用「月老红线」模板，降低填写门槛、统一调性</div>
+<div style="width:330px;background:#fff;border:2px solid #2f2f33;border-radius:30px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.12);position:relative">
+<div style="width:120px;height:22px;background:#2f2f33;margin:0 auto;border-radius:0 0 13px 13px"></div>
+<div style="min-height:620px;display:flex;flex-direction:column;padding-bottom:18px;filter:saturate(.6)">
+<div style="font-size:13px;font-weight:800;color:#222;padding:16px 20px 0">建档</div>
+<div style="font-size:12.5px;color:#555;font-weight:600;margin:18px 20px 8px">暧昧宣言</div>
+<div style="margin:0 20px;border:1px solid #d8d8d8;border-radius:10px;padding:12px;font-size:13px;color:#aaa">写一句… 或「套用模板」</div>
+</div>
+<!-- 模板选择浮层 -->
+<div style="position:absolute;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #eee;border-radius:18px 18px 0 0;box-shadow:0 -6px 20px rgba(0,0,0,.1);padding:16px 18px 20px">
+<div style="width:36px;height:4px;background:#ddd;border-radius:2px;margin:0 auto 14px"></div>
+<div style="font-size:13px;font-weight:800;color:#222;margin-bottom:12px">套用月老红线模板</div>
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="border:1.5px solid #2a6fdb;background:#f3f7fe;border-radius:10px;padding:11px 13px;font-size:12.5px;color:#2a6fdb">等一个并肩看潮光的人</div>
+<div style="border:1px solid #e2e2e2;border-radius:10px;padding:11px 13px;font-size:12.5px;color:#444">江湖路远，要不要顺路？</div>
+<div style="border:1px solid #e2e2e2;border-radius:10px;padding:11px 13px;font-size:12.5px;color:#444">想找个固定搭子，一起肝日常</div>
+<div style="border:1px solid #e2e2e2;border-radius:10px;padding:11px 13px;font-size:12.5px;color:#444">在线蹲一个一起看烟花的</div>
+</div>
+<div style="margin-top:16px;background:#2a6fdb;border-radius:12px;color:#fff;font-weight:700;text-align:center;padding:12px;font-size:14px">套用这一句</div>
+</div>
+</div>
+</div>
+
+</div>
+
+<!-- 建档完成领奖励 -->
+<div style="font-size:16px;font-weight:800;color:#1a1a2e;border-left:4px solid #ff5722;padding-left:12px;margin:40px 0 6px">3.1b 建档完成 — 领取首次奖励</div>
+<div style="font-size:13px;color:#666;line-height:1.7;padding-left:16px;margin-bottom:20px">建档表单提交后即可领取首次奖励。奖励内容待与策划确认。</div>
+<div style="display:flex;gap:32px;flex-wrap:wrap;justify-content:center;align-items:flex-start">
+<div style="display:flex;flex-direction:column;align-items:center">
+<div style="background:#1a1a2e;color:#fff;padding:7px 16px;border-radius:16px;font-size:12.5px;font-weight:600;margin-bottom:8px">建档完成 — 奖励待领态</div>
+<div style="font-size:11.5px;color:#777;margin-bottom:10px;max-width:300px;text-align:center">提交资料后即解锁，奖励内容待策划对齐</div>
+<div style="width:330px;background:#fff;border:2px solid #2f2f33;border-radius:30px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.12)">
+<div style="width:120px;height:22px;background:#2f2f33;margin:0 auto;border-radius:0 0 13px 13px"></div>
+<div style="min-height:480px;display:flex;flex-direction:column;padding-bottom:18px">
+<div style="text-align:center;font-size:12px;color:#999;letter-spacing:1px;padding:18px 16px 2px">月老 · 江湖红线</div>
+<div style="text-align:center;font-size:18px;font-weight:800;color:#222;padding:4px 16px 10px">建档完成！</div>
+<div style="margin:0 20px;border:1px solid #e2e2e2;border-radius:14px;background:#fafafa;padding:24px;text-align:center">
+<div style="width:56px;height:56px;border-radius:14px;background:#f0f0f0;border:1px solid #e2e2e2;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:24px;color:#c4c4c4">⊠</div>
+<div style="font-size:14px;font-weight:700;color:#333">首次奖励已就绪</div>
+<div style="font-size:11px;color:#999;margin-top:6px">奖励内容待策划确认</div>
+</div>
+<div style="flex:1"></div>
+<div style="margin:18px 20px 0;background:#2a6fdb;border-radius:12px;color:#fff;font-weight:700;text-align:center;padding:13px;font-size:14px">领取奖励</div>
+<div style="text-align:center;font-size:10.5px;color:#999;margin-top:10px">建档 D1–D3 均可领取 · 每号限一次</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- 3.2 弹幕墙 -->
+<div style="font-size:16px;font-weight:800;color:#1a1a2e;border-left:4px solid #ff5722;padding-left:12px;margin:40px 0 6px">3.2 暧昧上墙 · 公屏弹幕墙（D1–D3 核心氛围）<span style="color:#e0571f">★</span></div>
+<div style="font-size:13px;color:#666;line-height:1.7;padding-left:16px;margin-bottom:20px">匹配还没开，弹幕墙就是这三天的「内容」本身：一条条暧昧宣言公屏飘过，制造「大家都在表白，我也想上墙」的建档动机。</div>
+
+<div style="display:flex;gap:32px;flex-wrap:wrap;justify-content:center;align-items:flex-start">
+
+<div style="display:flex;flex-direction:column;align-items:center">
+<div style="background:#1a1a2e;color:#fff;padding:7px 16px;border-radius:16px;font-size:12.5px;font-weight:600;margin-bottom:8px">公屏弹幕墙 — 飘屏态</div>
+<div style="font-size:11.5px;color:#777;margin-bottom:10px;max-width:300px;text-align:center">点宣言 → 进档案 → 标记心动，反向拉建档</div>
+<div style="width:330px;background:#fff;border:2px solid #2f2f33;border-radius:30px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.12)">
+<div style="width:120px;height:22px;background:#2f2f33;margin:0 auto;border-radius:0 0 13px 13px"></div>
+<div style="min-height:620px;display:flex;flex-direction:column;padding-bottom:18px">
+<div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px 4px"><div style="font-size:14px;font-weight:800;color:#222">暧昧上墙</div><div style="font-size:11px;color:#e0571f;background:#fdeee7;border:1px solid #f6cbb6;border-radius:10px;padding:3px 9px">今日热门</div></div>
+<div style="position:relative;overflow:hidden;margin:10px 16px 0;border:1px solid #e2e2e2;border-radius:14px;background:#fbfbfb;height:352px">
+<div style="position:absolute;left:0;top:12px;white-space:nowrap;display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid #e2e2e2;border-radius:16px;padding:8px 13px;box-shadow:0 1px 4px rgba(0,0,0,.05);font-size:12.5px;color:#444;will-change:transform;animation:danmu 11s linear infinite"><span style="font-size:14px;color:#c4c4c4">⊠</span>等一个并肩看潮光的人</div>
+<div style="position:absolute;left:0;top:58px;white-space:nowrap;display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid #e2e2e2;border-radius:16px;padding:8px 13px;box-shadow:0 1px 4px rgba(0,0,0,.05);font-size:12.5px;color:#444;will-change:transform;animation:danmu 9s linear infinite;animation-delay:-3s"><span style="font-size:14px;color:#c4c4c4">⊠</span>只想找个固定搭子</div>
+<div style="position:absolute;left:0;top:104px;white-space:nowrap;display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid #e2e2e2;border-radius:16px;padding:8px 13px;box-shadow:0 1px 4px rgba(0,0,0,.05);font-size:12.5px;color:#444;will-change:transform;animation:danmu 12.5s linear infinite;animation-delay:-6s"><span style="font-size:14px;color:#c4c4c4">⊠</span>江湖路远，要不要顺路？</div>
+<div style="position:absolute;left:0;top:150px;white-space:nowrap;display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid #e2e2e2;border-radius:16px;padding:8px 13px;box-shadow:0 1px 4px rgba(0,0,0,.05);font-size:12.5px;color:#444;will-change:transform;animation:danmu 10s linear infinite;animation-delay:-1.5s"><span style="font-size:14px;color:#c4c4c4">⊠</span>在线蹲一个一起钓鱼的</div>
+<div style="position:absolute;left:0;top:196px;white-space:nowrap;display:inline-flex;align-items:center;gap:7px;background:#eef4fe;border:1px dashed #2a6fdb;border-radius:16px;padding:8px 13px;font-size:12.5px;color:#2a6fdb;will-change:transform;animation:danmu 13s linear infinite;animation-delay:-8s"><span style="font-size:14px;color:#9bc0f5">⊠</span>夜里的剑气，配你的灯</div>
+<div style="position:absolute;left:0;top:242px;white-space:nowrap;display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid #e2e2e2;border-radius:16px;padding:8px 13px;box-shadow:0 1px 4px rgba(0,0,0,.05);font-size:12.5px;color:#444;will-change:transform;animation:danmu 9.5s linear infinite;animation-delay:-4.5s"><span style="font-size:14px;color:#c4c4c4">⊠</span>作息党求同好，一起肝日常</div>
+<div style="position:absolute;left:0;top:288px;white-space:nowrap;display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid #e2e2e2;border-radius:16px;padding:8px 13px;box-shadow:0 1px 4px rgba(0,0,0,.05);font-size:12.5px;color:#444;will-change:transform;animation:danmu 11.5s linear infinite;animation-delay:-7s"><span style="font-size:14px;color:#c4c4c4">⊠</span>谁来陪我看一次潮汐</div>
+<div style="position:absolute;left:0;top:58px;white-space:nowrap;display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid #e2e2e2;border-radius:16px;padding:8px 13px;box-shadow:0 1px 4px rgba(0,0,0,.05);font-size:12.5px;color:#444;will-change:transform;animation:danmu 12.5s linear infinite;animation-delay:-9.2s"><span style="font-size:14px;color:#c4c4c4">⊠</span>同门派的，组个固定队呀</div>
+<div style="position:absolute;left:0;top:150px;white-space:nowrap;display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid #e2e2e2;border-radius:16px;padding:8px 13px;box-shadow:0 1px 4px rgba(0,0,0,.05);font-size:12.5px;color:#444;will-change:transform;animation:danmu 11s linear infinite;animation-delay:-6.5s"><span style="font-size:14px;color:#c4c4c4">⊠</span>求一个一起跨年的</div>
+</div>
+<div style="margin:12px 16px 0;background:#f3f7fe;border:1px solid #c5d8f5;border-radius:10px;padding:10px 14px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-size:12px;color:#2a6fdb;font-weight:700">每日任务 · 点 ♥ 5 个宣言</span><span style="font-size:11px;color:#999">已完成 3/5</span></div>
+<div style="height:5px;background:#dce9f9;border-radius:3px;overflow:hidden"><div style="height:100%;width:60%;background:#2a6fdb;border-radius:3px"></div></div>
+<div style="font-size:10.5px;color:#999;margin-top:5px">达成领奖励（奖励内容待与策划确认）</div>
+</div>
+<div style="text-align:center;font-size:11px;color:#999;margin-top:10px;padding:0 20px;line-height:1.6">点宣言可「标记心动」· 对方将收到消息反馈<br>匹配 D4 开启时被标记多的优先推送</div>
+<div style="flex:1"></div>
+<div style="margin:16px 20px 0;border:1.5px solid #2a6fdb;border-radius:12px;color:#2a6fdb;font-weight:700;text-align:center;padding:13px;font-size:14px">我也要上墙</div>
+</div>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;align-items:center">
+<div style="background:#1a1a2e;color:#fff;padding:7px 16px;border-radius:16px;font-size:12.5px;font-weight:600;margin-bottom:8px">被点到 — 消息反馈态</div>
+<div style="font-size:11.5px;color:#777;margin-bottom:10px;max-width:280px;text-align:center">宣言被心动后的通知，拉回对方查看你的檔案</div>
+<div style="width:290px;background:#fff;border:2px solid #2f2f33;border-radius:30px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.12)">
+<div style="width:110px;height:20px;background:#2f2f33;margin:0 auto;border-radius:0 0 12px 12px"></div>
+<div style="min-height:480px;display:flex;flex-direction:column;padding-bottom:16px">
+<div style="font-size:13px;font-weight:800;color:#222;padding:14px 16px 0">消息</div>
+<div style="margin:12px 14px 0;border:1.5px solid #c5d8f5;border-radius:12px;background:#f3f7fe;padding:12px;display:flex;gap:10px;align-items:flex-start">
+<div style="width:38px;height:38px;border-radius:50%;background:#dce8fb;display:flex;align-items:center;justify-content:center;font-size:16px;color:#2a6fdb;flex-shrink:0">♥</div>
+<div><div style="font-size:12.5px;font-weight:700;color:#222">沈墨白 对你的宣言心动了</div><div style="font-size:11px;color:#777;margin-top:3px">“等一个并肩看潮光的人”</div><div style="font-size:10.5px;color:#bbb;margin-top:4px">2分钟前</div></div>
+</div>
+<div style="margin:10px 14px 0;border:1px solid #f0f0f0;border-radius:12px;background:#fafafa;padding:12px;display:flex;gap:10px;align-items:flex-start">
+<div style="width:38px;height:38px;border-radius:50%;background:#f1f1f1;display:flex;align-items:center;justify-content:center;font-size:16px;color:#ccc;flex-shrink:0">♥</div>
+<div><div style="font-size:12.5px;font-weight:700;color:#555">林晗 对你的宣言心动了</div><div style="font-size:11px;color:#aaa;margin-top:3px">“江湖路远，要不要顺路？”</div><div style="font-size:10.5px;color:#ccc;margin-top:4px">1小时前</div></div>
+</div>
+<div style="flex:1"></div>
+<div style="margin:14px 14px 0;background:#2a6fdb;border-radius:10px;color:#fff;font-weight:700;text-align:center;padding:11px;font-size:13px">查看他的档案</div>
+</div>
+</div>
+</div>
+
+<div style="max-width:400px;display:flex;flex-direction:column;gap:14px;margin-top:6px">
+<div style="background:#fff;border:1px solid #e3e3e3;border-left:4px solid #ff5722;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.05);padding:14px 18px">
+<div style="font-size:13px;font-weight:800;color:#1a1a2e;margin-bottom:6px">冷启动（硬约束）</div>
+<div style="font-size:12px;color:#666;line-height:1.8">匹配池没人 = 空刷 = 差体验。建档量是阶段二能否开启的硬门槛。<br>· 种子：帮会资源（45+ 帮主 / 管理）、KOC、官方红娘账号先行铺池<br>· 设单服 / 单市场最低建档阈值，未达标延后或合并区服开匹配</div>
+</div>
+<div style="background:#fff;border:1px solid #e3e3e3;border-left:4px solid #ff5722;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.05);padding:14px 18px">
+<div style="font-size:13px;font-weight:800;color:#1a1a2e;margin-bottom:6px">内容把控（公屏 = 公开广播）</div>
+<div style="font-size:12px;color:#666;line-height:1.8">宣言先过敏感词 / 外链 / 联系方式过滤再上墙；可延迟或抽样上墙、人工巡查；一人在墙数量限频；举报即下墙。</div>
+</div>
+<div style="background:#fff;border:1px solid #e3e3e3;border-left:4px solid #2a6fdb;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.05);padding:14px 18px">
+<div style="font-size:13px;font-weight:800;color:#1a1a2e;margin-bottom:6px">端内联动（可选 · 高价值）</div>
+<div style="font-size:12px;color:#666;line-height:1.8">精选宣言同步到游戏内场景（主城地标 / 灯会公屏弹幕），端内点击可唤起 H5，形成 H5×端内导流。</div>
+</div>
+</div>
+
+</div>
+
+</div>
+
+<div style="max-width:1200px;margin:0 auto;padding:0 24px 40px">
+
+<!-- ============ S4 阶段二 Ship or Swipe ============ -->
+<div style="border-top:3px solid #1a1a2e;margin-top:50px;padding-top:24px;text-align:center">
+<div style="font-size:22px;font-weight:800;color:#1a1a2e">四、阶段二 · 匹配期（D4–D10）Ship or Swipe</div>
+<div style="font-size:13px;color:#666;margin-top:6px">Tinder 式滑卡，单张全屏；不把双向当唯一门槛——分层结果 + 月老保底，人人至少有一条线。</div>
+</div>
+
+<div style="font-size:16px;font-weight:800;color:#1a1a2e;border-left:4px solid #ff5722;padding-left:12px;margin:30px 0 6px">4.1 滑卡交互</div>
+<div style="font-size:13px;color:#666;line-height:1.7;padding-left:16px;margin-bottom:20px">右滑 = Ship（心动）/ 左滑 = Skip。每日配额 N 次（制造稀缺、防刷），刷新需道具或分享解锁。</div>
+
+<div style="display:flex;gap:32px;flex-wrap:wrap;justify-content:center;align-items:flex-start">
+
+<!-- 滑卡主态 -->
+<div style="display:flex;flex-direction:column;align-items:center">
+<div style="background:#1a1a2e;color:#fff;padding:7px 16px;border-radius:16px;font-size:12.5px;font-weight:600;margin-bottom:8px">Ship or Swipe — 滑卡态</div>
+<div style="font-size:11.5px;color:#777;margin-bottom:10px;max-width:300px;text-align:center">卡片正面：快照 + 标签 + 暧昧宣言 + 性别 / 门派</div>
+<div style="width:330px;background:#fff;border:2px solid #2f2f33;border-radius:30px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.12)">
+<div style="width:120px;height:22px;background:#2f2f33;margin:0 auto;border-radius:0 0 13px 13px"></div>
+<div style="min-height:620px;display:flex;flex-direction:column;padding-bottom:18px">
+<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px 10px"><div style="font-size:13px;font-weight:800;color:#222">Ship or Swipe</div><div style="font-size:11px;color:#999">今日剩余 <b style="color:#2a6fdb">3</b> 次</div></div>
+<div style="margin:0 18px;border:1px solid #e2e2e2;border-radius:18px;overflow:hidden;background:#fafafa;position:relative">
+<div style="height:300px;display:flex;align-items:center;justify-content:center;font-size:48px;color:#cdcdcd">⊠</div>
+<div style="padding:14px 16px 16px;background:#fff;border-top:1px solid #f0f0f0">
+<div style="font-size:17px;font-weight:800;color:#222">沈墨白 · 铁衣</div>
+<div style="display:flex;gap:8px;margin:8px 0 10px">
+<span style="border:1px solid #d8d8d8;color:#555;border-radius:12px;padding:4px 11px;font-size:11.5px">夜猫子</span>
+<span style="border:1px solid #d8d8d8;color:#555;border-radius:12px;padding:4px 11px;font-size:11.5px">CP向</span>
+</div>
+<div style="font-size:12.5px;color:#666;font-style:italic">“在线蹲一个一起看烟花的”</div>
+</div>
+</div>
+<div style="display:flex;align-items:center;justify-content:center;gap:22px;padding:18px 0 6px">
+<div style="width:54px;height:54px;border-radius:50%;border:1.5px solid #d8d8d8;color:#999;display:flex;align-items:center;justify-content:center;font-size:22px">✕</div>
+<div style="width:46px;height:46px;border-radius:50%;border:1.5px solid #2a6fdb;color:#2a6fdb;display:flex;align-items:center;justify-content:center;font-size:18px">★</div>
+<div style="width:54px;height:54px;border-radius:50%;border:2px solid #2a6fdb;background:#f3f7fe;color:#2a6fdb;display:flex;align-items:center;justify-content:center;font-size:24px">♥</div>
+</div>
+<div style="flex:1"></div>
+<div style="text-align:center;font-size:11px;color:#999;padding:8px 20px 0">左滑 Skip · 右滑 Ship · 中间 ★红线直送（每日限量 1 次）</div>
+</div>
+</div>
+</div>
+
+<!-- 红线直送态 -->
+<div style="display:flex;flex-direction:column;align-items:center">
+<div style="background:#1a1a2e;color:#fff;padding:7px 16px;border-radius:16px;font-size:12.5px;font-weight:600;margin-bottom:8px">被 Ship — 红线直送态</div>
+<div style="font-size:11.5px;color:#777;margin-bottom:10px;max-width:300px;text-align:center">「有人对你心动了」推送，对方进来即见，大幅提高回 ship</div>
+<div style="width:330px;background:#fff;border:2px solid #2f2f33;border-radius:30px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.12)">
+<div style="width:120px;height:22px;background:#2f2f33;margin:0 auto;border-radius:0 0 13px 13px"></div>
+<div style="min-height:620px;display:flex;flex-direction:column;padding-bottom:18px">
+<div style="margin:16px 18px 0;background:#fdeee7;border:1px solid #f6cbb6;border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:8px"><span style="font-size:16px;color:#e0571f">★</span><span style="font-size:12.5px;color:#c2502c;font-weight:700">红线直送 · 有人对你心动了</span></div>
+<div style="margin:14px 18px 0;border:1px solid #e2e2e2;border-radius:18px;overflow:hidden;background:#fafafa">
+<div style="height:280px;display:flex;align-items:center;justify-content:center;font-size:48px;color:#cdcdcd">⊠</div>
+<div style="padding:14px 16px 16px;background:#fff;border-top:1px solid #f0f0f0">
+<div style="font-size:17px;font-weight:800;color:#222">林晚 · 素问</div>
+<div style="display:flex;gap:8px;margin:8px 0 0"><span style="border:1px solid #d8d8d8;color:#555;border-radius:12px;padding:4px 11px;font-size:11.5px">同玩法</span><span style="border:1px solid #d8d8d8;color:#555;border-radius:12px;padding:4px 11px;font-size:11.5px">作息党</span></div>
+</div>
+</div>
+<div style="flex:1"></div>
+<div style="margin:16px 20px 0;background:#2a6fdb;border-radius:12px;color:#fff;font-weight:700;text-align:center;padding:13px;font-size:14px">回 Ship · 牵成红线</div>
+<div style="margin:10px 20px 0;border:1.5px solid #d8d8d8;border-radius:12px;color:#888;font-weight:600;text-align:center;padding:12px;font-size:13px">先看看 TA 的档案</div>
+</div>
+</div>
+</div>
+
+<!-- 配额/权重说明 -->
+<div style="max-width:380px;display:flex;flex-direction:column;gap:14px;margin-top:6px">
+<div style="background:#fff;border:1px solid #e3e3e3;border-left:4px solid #2a6fdb;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.05);padding:14px 18px">
+<div style="font-size:13px;font-weight:800;color:#1a1a2e;margin-bottom:6px">匹配池与权重</div>
+<div style="font-size:12px;color:#666;line-height:1.8">同 intent 同池，不跨轨。随机抽取 + 轻权重排序：标签重合度 &gt; 同活跃时段 &gt; 同区服；避免连续重复同一人。</div>
+</div>
+<div style="background:#fff;border:1px solid #e3e3e3;border-left:4px solid #2a6fdb;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.05);padding:14px 18px">
+<div style="font-size:13px;font-weight:800;color:#1a1a2e;margin-bottom:6px">降低双向难度的机制</div>
+<div style="font-size:12px;color:#666;line-height:1.8">· 心动优先推送：你 ship 谁，就插到对方牌堆前排<br>· 红线直送：每人每日限量 1 次超级心动<br>· 被 ship 通知拉回，缩短异步错过</div>
+</div>
+<div style="background:#fff;border:1px solid #e3e3e3;border-left:4px solid #ff5722;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.05);padding:14px 18px">
+<div style="font-size:13px;font-weight:800;color:#1a1a2e;margin-bottom:6px">配额 N <span style="color:#e0571f;font-size:11px">★ 待确认</span></div>
+<div style="font-size:12px;color:#666;line-height:1.8">每日 swipe 配额 N 次，刷新需道具或分享解锁额外次数。N 数值与周期排期待与 1.2.4 版更对齐。</div>
+</div>
+</div>
+
+</div>
+
+<!-- 4.2 命中分层 -->
+<div style="font-size:16px;font-weight:800;color:#1a1a2e;border-left:4px solid #ff5722;padding-left:12px;margin:40px 0 6px">4.2 命中逻辑 · 分层结果 + 月老保底 <span style="color:#e0571f">★</span></div>
+<div style="font-size:13px;color:#666;line-height:1.7;padding-left:16px;margin-bottom:20px">纯双向命中会让多数人空刷、契约副本没人进。改为分层结果：双向是「自己牵成的线」（最高级），但人人都至少有一条线，没人空手而归。</div>
+
+<div style="display:flex;gap:28px;flex-wrap:wrap;justify-content:center;align-items:flex-start">
+
+<!-- A 双向自牵成 -->
+<div style="display:flex;flex-direction:column;align-items:center">
+<div style="background:#1a1a2e;color:#fff;padding:7px 16px;border-radius:16px;font-size:12.5px;font-weight:600;margin-bottom:8px">①双向 ship — 红线自牵成</div>
+<div style="font-size:11.5px;color:#777;margin-bottom:10px;max-width:280px;text-align:center">最高级 · 解锁私信 + 红线信物 + 一键组队</div>
+<div style="width:300px;background:#fff;border:2px solid #2f2f33;border-radius:30px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.12)">
+<div style="width:110px;height:20px;background:#2f2f33;margin:0 auto;border-radius:0 0 12px 12px"></div>
+<div style="min-height:520px;display:flex;flex-direction:column;padding:20px 18px 18px">
+<div style="text-align:center;font-size:20px;font-weight:800;color:#222;margin-top:6px">红线牵成</div>
+<div style="text-align:center;font-size:12.5px;color:#666;margin-top:6px">你和「沈墨白」互相心动</div>
+<div style="display:flex;align-items:center;justify-content:center;gap:6px;margin:24px 0">
+<div style="width:60px;height:60px;border-radius:50%;background:#f1ede9;display:flex;align-items:center;justify-content:center;font-size:22px;color:#bbb">⊠</div>
+<div style="flex:0 0 34px;color:#cc5a3a;text-align:center;font-size:16px;letter-spacing:1px">·····</div>
+<div style="width:50px;height:50px;border-radius:50%;background:#fdeee7;border:1px solid #f6cbb6;display:flex;align-items:center;justify-content:center;font-size:18px;color:#e0571f">♥</div>
+<div style="flex:0 0 34px;color:#cc5a3a;text-align:center;font-size:16px;letter-spacing:1px">·····</div>
+<div style="width:60px;height:60px;border-radius:50%;background:#f1ede9;display:flex;align-items:center;justify-content:center;font-size:22px;color:#bbb">⊠</div>
+</div>
+<div style="border:1.5px solid #2a6fdb;border-radius:12px;color:#2a6fdb;font-weight:700;text-align:center;padding:12px;font-size:13.5px;display:flex;align-items:center;justify-content:center;gap:6px"><span>⊠</span>私聊</div>
+<div style="border:1px solid #d8d8d8;border-radius:12px;color:#555;font-weight:600;text-align:center;padding:11px;font-size:13px;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:6px"><span>⊠</span>游戏内加好友</div>
+<div style="border:1px solid #d8d8d8;border-radius:12px;color:#555;font-weight:600;text-align:center;padding:11px;font-size:13px;margin-top:10px">组队进契约副本</div>
+<div style="flex:1"></div>
+<div style="text-align:center;font-size:10.5px;color:#999;margin-top:14px">⊠ 私聊仅双向后开启（反骚扰）</div>
+</div>
+</div>
+</div>
+
+<!-- B 单向 -->
+<div style="display:flex;flex-direction:column;align-items:center">
+<div style="background:#1a1a2e;color:#fff;padding:7px 16px;border-radius:16px;font-size:12.5px;font-weight:600;margin-bottom:8px">②单向 ship</div>
+<div style="font-size:11.5px;color:#777;margin-bottom:10px;max-width:280px;text-align:center">进入对方心动池，累计「我心动的人」</div>
+<div style="width:300px;background:#fff;border:2px solid #2f2f33;border-radius:30px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.12)">
+<div style="width:110px;height:20px;background:#2f2f33;margin:0 auto;border-radius:0 0 12px 12px"></div>
+<div style="min-height:520px;display:flex;flex-direction:column;padding:20px 18px 18px">
+<div style="display:flex;justify-content:center"><span style="font-size:11px;font-weight:700;color:#2a6fdb;background:#e9f0fc;border:1px solid #c5d8f5;border-radius:10px;padding:3px 10px">单向心动</span></div>
+<div style="text-align:center;font-size:19px;font-weight:800;color:#222;margin-top:14px">你已心动「沈墨白」</div>
+<div style="text-align:center;font-size:12.5px;color:#666;margin-top:8px;line-height:1.7">已进入对方「心动池」<br>等待对方回 ship 即可牵成</div>
+<div style="margin:22px 0 0;border:1px solid #e2e2e2;border-radius:12px;background:#fafafa;padding:14px;display:flex;align-items:center;gap:12px">
+<div style="width:44px;height:44px;border-radius:50%;background:#fdeee7;border:1px solid #f6cbb6;display:flex;align-items:center;justify-content:center;font-size:18px;color:#e0571f">♥</div>
+<div><div style="font-size:13px;font-weight:700;color:#333">我心动的人 +1</div><div style="font-size:11px;color:#999;margin-top:2px">可在心动报告查看</div></div>
+</div>
+<div style="flex:1"></div>
+<div style="border:1.5px solid #2a6fdb;border-radius:12px;color:#2a6fdb;font-weight:700;text-align:center;padding:12px;font-size:13.5px">继续滑卡</div>
+<div style="text-align:center;font-size:10.5px;color:#999;margin-top:12px">对方可在「被心动列表」看到并回 ship</div>
+</div>
+</div>
+</div>
+
+<!-- C 月老保底 -->
+<div style="display:flex;flex-direction:column;align-items:center">
+<div style="background:#1a1a2e;color:#fff;padding:7px 16px;border-radius:16px;font-size:12.5px;font-weight:600;margin-bottom:8px">③月老保底线</div>
+<div style="font-size:11.5px;color:#777;margin-bottom:10px;max-width:280px;text-align:center">人人至少 1 条 · 可进副本，奖励低于自牵成</div>
+<div style="width:300px;background:#fff;border:2px solid #2f2f33;border-radius:30px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.12)">
+<div style="width:110px;height:20px;background:#2f2f33;margin:0 auto;border-radius:0 0 12px 12px"></div>
+<div style="min-height:520px;display:flex;flex-direction:column;padding:20px 18px 18px">
+<div style="display:flex;justify-content:center"><span style="font-size:11px;font-weight:700;color:#7a5a1a;background:#fbf1d8;border:1px solid #ecd9a0;border-radius:10px;padding:3px 10px">月老保底</span></div>
+<div style="text-align:center;margin-top:16px"><div style="width:64px;height:64px;border-radius:50%;background:#fbf1d8;border:1px solid #ecd9a0;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:24px;color:#b8923a">⊠</div><div style="font-size:11px;color:#999;margin-top:6px">NPC 月老 · 乱点鸳鸯</div></div>
+<div style="text-align:center;font-size:18px;font-weight:800;color:#222;margin-top:14px">月老牵了一条线</div>
+<div style="text-align:center;font-size:12.5px;color:#666;margin-top:8px;line-height:1.7">你和「林晚」被月老撮合<br>（按标签 / 活跃时段加权）</div>
+<div style="flex:1"></div>
+<div style="background:#2a6fdb;border-radius:12px;color:#fff;font-weight:700;text-align:center;padding:12px;font-size:13.5px">组队进契约副本</div>
+<div style="text-align:center;font-size:10.5px;color:#999;margin-top:12px">奖励低于自牵成线</div>
+</div>
+</div>
+</div>
+
+<!-- D 纯参与 -->
+<div style="display:flex;flex-direction:column;align-items:center">
+<div style="background:#1a1a2e;color:#fff;padding:7px 16px;border-radius:16px;font-size:12.5px;font-weight:600;margin-bottom:8px">④纯参与</div>
+<div style="font-size:11.5px;color:#777;margin-bottom:10px;max-width:280px;text-align:center">swipe 满 N 次即得基础奖励 + 心动报告</div>
+<div style="width:300px;background:#fff;border:2px solid #2f2f33;border-radius:30px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.12)">
+<div style="width:110px;height:20px;background:#2f2f33;margin:0 auto;border-radius:0 0 12px 12px"></div>
+<div style="min-height:520px;display:flex;flex-direction:column;padding:20px 18px 18px">
+<div style="display:flex;justify-content:center"><span style="font-size:11px;font-weight:700;color:#666;background:#f1f1f1;border:1px solid #ddd;border-radius:10px;padding:3px 10px">纯参与</span></div>
+<div style="text-align:center;margin-top:20px"><div style="width:64px;height:64px;border-radius:14px;background:#fafafa;border:1px solid #e2e2e2;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:26px;color:#c4c4c4">⊠</div></div>
+<div style="text-align:center;font-size:18px;font-weight:800;color:#222;margin-top:16px">今日 swipe 已达 N 次</div>
+<div style="text-align:center;font-size:12.5px;color:#666;margin-top:8px;line-height:1.7">基础奖励已到账<br>看看谁对你心动过</div>
+<div style="margin:20px 0 0;border:1px solid #e2e2e2;border-radius:12px;background:#fafafa;padding:12px;text-align:center;font-size:12px;color:#777">基础奖励 · 道具 ×N</div>
+<div style="flex:1"></div>
+<div style="border:1.5px solid #2a6fdb;border-radius:12px;color:#2a6fdb;font-weight:700;text-align:center;padding:12px;font-size:13.5px">查看心动报告</div>
+</div>
+</div>
+</div>
+
+</div>
+
+<!-- 命中分层 spec -->
+<div style="max-width:900px;margin:30px auto 0;background:#fff;border-radius:12px;border:1px solid #e3e3e3;border-left:4px solid #ff5722;box-shadow:0 2px 10px rgba(0,0,0,.05);padding:16px 22px">
+<div style="font-size:14px;font-weight:800;color:#1a1a2e;margin-bottom:10px">结果分层（人人有交代）</div>
+<div style="font-size:12.5px;color:#555;line-height:2.1">
+<b style="color:#222">① 双向 ship = 红线自牵成（最高）</b>：解锁私信 + 红线信物 + 一键组队进契约副本，专属标识。<br>
+<b style="color:#222">② 单向 ship</b>：你进入对方「心动池」，对方可在心动报告 / 被心动列表回 ship；你累计「我心动的人」。<br>
+<b style="color:#222">③ 月老保底线</b>：活动期内每人至少由系统撮合 1 条红线，可进契约副本，奖励低于自牵成。<br>
+<b style="color:#222">④ 纯参与</b>：swipe 满 N 次即得基础奖励 + 心动报告。<br>
+<span style="color:#2a6fdb;font-weight:600">私信仍仅双向后开启（这是反骚扰，非难度）——契约副本 / 奖励 / 进度均不卡双向。</span>
+</div>
+<div style="margin-top:14px;border-top:1px solid #f0f0f0;padding-top:14px;display:flex;align-items:center;gap:10px">
+<div style="font-size:12.5px;font-weight:700;color:#1a1a2e;flex-shrink:0">每日配对奖励</div>
+<div style="flex:1;font-size:12px;color:#666;line-height:1.7">每天完成当日配额（swipe N 次）即可领取每日奖励。奖励内容待与策划确认。</div>
+<div style="flex-shrink:0;font-size:11px;color:#e0571f;background:#fdeee7;border:1px solid #f6cbb6;border-radius:8px;padding:4px 10px">★ 待确认</div>
+</div>
+</div>
+</div>
+
+</div>
+
+<div style="max-width:1200px;margin:0 auto;padding:0 24px 40px">
+
+<!-- ============ S5 阶段三 后续 ============ -->
+<div style="border-top:3px solid #1a1a2e;margin-top:50px;padding-top:24px;text-align:center">
+<div style="font-size:22px;font-weight:800;color:#1a1a2e">五、阶段三 · 后续活动（滚动）</div>
+<div style="font-size:13px;color:#666;margin-top:6px">把人和情绪导回游戏：CP 进契约副本（端内回流 + 付费），个人看心动报告（分享裂变）。</div>
+</div>
+
+<div style="display:flex;gap:32px;flex-wrap:wrap;justify-content:center;align-items:flex-start;margin-top:26px">
+
+<!-- 契约副本 -->
+<div style="display:flex;flex-direction:column;align-items:center">
+<div style="background:#1a1a2e;color:#fff;padding:7px 16px;border-radius:16px;font-size:12.5px;font-weight:600;margin-bottom:8px">5.1 契约副本</div>
+<div style="font-size:11.5px;color:#777;margin-bottom:10px;max-width:320px;text-align:center">自牵成 / 月老保底 / 临时组队 / 搭子线 均可进，不卡双向</div>
+<div style="width:330px;background:#fff;border:2px solid #2f2f33;border-radius:30px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.12)">
+<div style="width:120px;height:22px;background:#2f2f33;margin:0 auto;border-radius:0 0 13px 13px"></div>
+<div style="min-height:600px;display:flex;flex-direction:column;padding-bottom:18px">
+<div style="font-size:14px;font-weight:800;color:#222;padding:16px 20px 0">契约副本</div>
+<div style="margin:12px 18px 0;border:1px solid #e2e2e2;border-radius:14px;background:#fafafa;height:170px;display:flex;align-items:center;justify-content:center;font-size:40px;color:#cdcdcd">⊠</div>
+<div style="font-size:16px;font-weight:800;color:#222;text-align:center;margin-top:14px">与「沈墨白」的契约</div>
+<div style="margin:10px 18px 0;font-size:11px;color:#777;background:#f4f4f4;border-radius:8px;padding:8px 12px;text-align:center">准入：自牵成 / 保底线 / 临时组队 / 搭子线 均可进 · 主打互动非战力</div>
+<div style="font-size:12.5px;color:#555;font-weight:600;margin:16px 20px 8px">通关奖励</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;padding:0 18px">
+<div style="text-align:center"><div style="height:48px;border:1px solid #e2e2e2;border-radius:10px;background:#fafafa;display:flex;align-items:center;justify-content:center;font-size:18px;color:#c4c4c4">⊠</div><div style="font-size:9.5px;color:#888;margin-top:4px">合影框</div></div>
+<div style="text-align:center"><div style="height:48px;border:1px solid #e2e2e2;border-radius:10px;background:#fafafa;display:flex;align-items:center;justify-content:center;font-size:18px;color:#c4c4c4">⊠</div><div style="font-size:9.5px;color:#888;margin-top:4px">双人坐骑</div></div>
+<div style="text-align:center"><div style="height:48px;border:1px solid #e2e2e2;border-radius:10px;background:#fafafa;display:flex;align-items:center;justify-content:center;font-size:18px;color:#c4c4c4">⊠</div><div style="font-size:9.5px;color:#888;margin-top:4px">情侣外观</div></div>
+<div style="text-align:center"><div style="height:48px;border:1px solid #e2e2e2;border-radius:10px;background:#fafafa;display:flex;align-items:center;justify-content:center;font-size:18px;color:#c4c4c4">⊠</div><div style="font-size:9.5px;color:#888;margin-top:4px">信物升阶</div></div>
+</div>
+<div style="flex:1"></div>
+<div style="margin:18px 20px 0;background:#2a6fdb;border-radius:12px;color:#fff;font-weight:700;text-align:center;padding:13px;font-size:14px">一键组队进副本</div>
+<div style="text-align:center;font-size:10.5px;color:#999;margin-top:10px">付费 / 收集钩子：信物 · 合影框 · 情侣外观</div>
+</div>
+</div>
+</div>
+
+<!-- 心动报告 -->
+<div style="display:flex;flex-direction:column;align-items:center">
+<div style="background:#1a1a2e;color:#fff;padding:7px 16px;border-radius:16px;font-size:12.5px;font-weight:600;margin-bottom:8px">5.2 心动报告</div>
+<div style="font-size:11.5px;color:#777;margin-bottom:10px;max-width:320px;text-align:center">个人结算 H5 · 生成可分享卡，导回建档 / 匹配做二次拉新</div>
+<div style="width:330px;background:#fff;border:2px solid #2f2f33;border-radius:30px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.12)">
+<div style="width:120px;height:22px;background:#2f2f33;margin:0 auto;border-radius:0 0 13px 13px"></div>
+<div style="min-height:600px;display:flex;flex-direction:column;padding-bottom:18px">
+<div style="font-size:14px;font-weight:800;color:#222;padding:16px 20px 0">心动报告</div>
+<div style="display:flex;gap:10px;padding:14px 18px 0">
+<div style="flex:1;border:1px solid #e2e2e2;border-radius:12px;background:#fafafa;padding:14px;text-align:center"><div style="font-size:24px;font-weight:800;color:#2a6fdb">24</div><div style="font-size:11px;color:#777;margin-top:4px">人右滑了你</div></div>
+<div style="flex:1;border:1px solid #f6cbb6;border-radius:12px;background:#fdf6f2;padding:14px;text-align:center"><div style="font-size:24px;font-weight:800;color:#e0571f">2</div><div style="font-size:11px;color:#777;margin-top:4px">条红线命中</div></div>
+</div>
+<div style="font-size:12.5px;color:#555;font-weight:600;margin:18px 20px 8px">江湖人缘画像</div>
+<div style="margin:0 18px;border:1px solid #e2e2e2;border-radius:12px;background:#fafafa;padding:14px;display:flex;align-items:center;gap:12px"><div style="width:48px;height:48px;border-radius:10px;background:#fff;border:1px solid #e2e2e2;display:flex;align-items:center;justify-content:center;font-size:20px;color:#c4c4c4">⊠</div><div><div style="font-size:13px;font-weight:700;color:#333">「人间理想型」</div><div style="font-size:11px;color:#999;margin-top:2px">夜猫子 · CP向 · 高人缘</div></div></div>
+<div style="font-size:12.5px;color:#555;font-weight:600;margin:16px 20px 8px">错过的人（回流钩子）</div>
+<div style="display:flex;gap:8px;padding:0 20px">
+<div style="width:46px;height:46px;border-radius:50%;background:#f1f1f1;display:flex;align-items:center;justify-content:center;font-size:18px;color:#c4c4c4">⊠</div>
+<div style="width:46px;height:46px;border-radius:50%;background:#f1f1f1;display:flex;align-items:center;justify-content:center;font-size:18px;color:#c4c4c4">⊠</div>
+<div style="width:46px;height:46px;border-radius:50%;background:#f1f1f1;display:flex;align-items:center;justify-content:center;font-size:18px;color:#c4c4c4">⊠</div>
+<div style="width:46px;height:46px;border-radius:50%;background:#f1f1f1;display:flex;align-items:center;justify-content:center;font-size:12px;color:#999">+5</div>
+</div>
+<div style="flex:1"></div>
+<div style="margin:18px 20px 0;background:#2a6fdb;border-radius:12px;color:#fff;font-weight:700;text-align:center;padding:13px;font-size:14px">生成总结卡 · 分享领奖励</div>
+<div style="text-align:center;font-size:10.5px;color:#999;margin-top:8px">分享好友可各得奖励 · 奖励内容待与策划确认</div>
+</div>
+</div>
+</div>
+
+</div>
+
+<!-- ============ S6 反塌方 吃瓜磕CP ============ -->
+<div style="border-top:3px solid #1a1a2e;margin-top:50px;padding-top:24px;text-align:center">
+<div style="font-size:22px;font-weight:800;color:#1a1a2e">六、反塌方 · 吃瓜 / 磕 CP 层（旁路 · 全程开放）</div>
+<div style="font-size:13px;color:#666;margin-top:6px">不必自己上场，所有人都能围观；也是匹配池稀薄时的体验兜底。</div>
+</div>
+
+<div style="display:flex;gap:32px;flex-wrap:wrap;justify-content:center;align-items:flex-start;margin-top:26px">
+
+<div style="display:flex;flex-direction:column;align-items:center">
+<div style="background:#1a1a2e;color:#fff;padding:7px 16px;border-radius:16px;font-size:12.5px;font-weight:600;margin-bottom:8px">吃瓜 · 磕 CP — 围观态</div>
+<div style="font-size:11.5px;color:#777;margin-bottom:10px;max-width:320px;text-align:center">红线榜 / 名场面 · 匿名磕 CP · 投票</div>
+<div style="width:330px;background:#fff;border:2px solid #2f2f33;border-radius:30px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.12)">
+<div style="width:120px;height:22px;background:#2f2f33;margin:0 auto;border-radius:0 0 13px 13px"></div>
+<div style="min-height:600px;display:flex;flex-direction:column;padding-bottom:18px">
+<div style="font-size:14px;font-weight:800;color:#222;padding:16px 20px 12px">吃瓜现场</div>
+<div style="display:flex;margin:0 18px;border:1px solid #d8d8d8;border-radius:10px;overflow:hidden;font-size:12.5px">
+<div style="flex:1;text-align:center;padding:9px;background:#e9f0fc;color:#2a6fdb;font-weight:700">今日红线榜</div>
+<div style="flex:1;text-align:center;padding:9px;color:#666">名场面</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;padding:14px 18px 0">
+<div style="display:flex;align-items:center;gap:10px;border:1px solid #e2e2e2;border-radius:10px;padding:9px 12px"><span style="font-size:14px;font-weight:800;color:#e0571f">1</span><span style="font-size:16px;color:#c4c4c4">⊠</span><span style="font-size:12.5px;color:#333;flex:1">沈墨白 <span style="color:#cc5a3a">×</span> 林晚</span><span style="font-size:11px;color:#999">磕 1.2k</span></div>
+<div style="display:flex;align-items:center;gap:10px;border:1px solid #e2e2e2;border-radius:10px;padding:9px 12px"><span style="font-size:14px;font-weight:800;color:#e0571f">2</span><span style="font-size:16px;color:#c4c4c4">⊠</span><span style="font-size:12.5px;color:#333;flex:1">江照月 <span style="color:#cc5a3a">×</span> 顾长风</span><span style="font-size:11px;color:#999">磕 880</span></div>
+<div style="display:flex;align-items:center;gap:10px;border:1px solid #e2e2e2;border-radius:10px;padding:9px 12px"><span style="font-size:14px;font-weight:800;color:#999">3</span><span style="font-size:16px;color:#c4c4c4">⊠</span><span style="font-size:12.5px;color:#333;flex:1">苏暮 <span style="color:#cc5a3a">×</span> 白霜</span><span style="font-size:11px;color:#999">磕 640</span></div>
+</div>
+<div style="font-size:12.5px;color:#555;font-weight:600;margin:18px 20px 8px">匿名磕 CP · 投票</div>
+<div style="margin:0 18px;border:1px solid #e2e2e2;border-radius:12px;background:#fafafa;padding:14px">
+<div style="display:flex;align-items:center;justify-content:center;gap:10px"><div style="width:40px;height:40px;border-radius:50%;background:#fff;border:1px solid #e2e2e2;display:flex;align-items:center;justify-content:center;font-size:16px;color:#c4c4c4">⊠</div><span style="font-size:16px;color:#cc5a3a">♥</span><div style="width:40px;height:40px;border-radius:50%;background:#fff;border:1px solid #e2e2e2;display:flex;align-items:center;justify-content:center;font-size:16px;color:#c4c4c4">⊠</div></div>
+<div style="display:flex;gap:8px;margin-top:12px"><div style="flex:1;border:1.5px solid #2a6fdb;border-radius:10px;color:#2a6fdb;text-align:center;padding:8px;font-size:12px;font-weight:700">磕！</div><div style="flex:1;border:1px solid #d8d8d8;border-radius:10px;color:#888;text-align:center;padding:8px;font-size:12px">下一对</div></div>
+</div>
+<div style="flex:1"></div>
+<div style="text-align:center;font-size:10.5px;color:#999;margin-top:14px">系统月老「乱点鸳鸯」兜底，保住基本体验与梗</div>
+</div>
+</div>
+</div>
+
+</div>
+
+</div>
+
+<div style="max-width:1200px;margin:0 auto;padding:0 24px 80px">
+
+<!-- ============ S7 端内导流闭环 ============ -->
+<div style="border-top:3px solid #1a1a2e;margin-top:50px;padding-top:24px;text-align:center">
+<div style="font-size:22px;font-weight:800;color:#1a1a2e">七、端内导流闭环（marketing 核心）</div>
+<div style="font-size:13px;color:#666;margin-top:6px">每一步都要有回游戏的钩子，H5 不是终点。</div>
+</div>
+
+<div style="display:flex;gap:14px;max-width:1000px;margin:26px auto 0;flex-wrap:wrap;justify-content:center">
+<div style="flex:1;min-width:210px;border:1.5px solid #d8d8d8;border-radius:14px;background:#fff;padding:16px"><div style="font-size:12.5px;color:#999;margin-bottom:6px">准入校验</div><div style="font-size:13px;font-weight:700;color:#222;line-height:1.6">无号 / 未达 50 级 → 引导下载 · 升级</div></div>
+<div style="flex:1;min-width:210px;border:1.5px solid #d8d8d8;border-radius:14px;background:#fff;padding:16px"><div style="font-size:12.5px;color:#999;margin-bottom:6px">牵线成功</div><div style="font-size:13px;font-weight:700;color:#222;line-height:1.6">一键组队进游戏</div></div>
+<div style="flex:1;min-width:210px;border:1.5px solid #d8d8d8;border-radius:14px;background:#fff;padding:16px"><div style="font-size:12.5px;color:#999;margin-bottom:6px">契约副本</div><div style="font-size:13px;font-weight:700;color:#222;line-height:1.6">玩法在端内完成</div></div>
+<div style="flex:1;min-width:210px;border:1.5px solid #d8d8d8;border-radius:14px;background:#fff;padding:16px"><div style="font-size:12.5px;color:#999;margin-bottom:6px">心动报告</div><div style="font-size:13px;font-weight:700;color:#222;line-height:1.6">分享卡落地页回 H5 / 端内</div></div>
+</div>
+
+<!-- ============ S8 防滥用 & 待确认 ============ -->
+<div style="border-top:3px solid #1a1a2e;margin-top:50px;padding-top:24px;text-align:center">
+<div style="font-size:22px;font-weight:800;color:#1a1a2e">八、防滥用最小集 &amp; 待确认</div>
+</div>
+
+<div style="display:flex;gap:24px;flex-wrap:wrap;justify-content:center;max-width:1000px;margin:26px auto 0">
+<div style="flex:1;min-width:300px;background:#fff;border:1px solid #e3e3e3;border-left:4px solid #2a6fdb;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.05);padding:16px 20px">
+<div style="font-size:14px;font-weight:800;color:#1a1a2e;margin-bottom:10px">防滥用（最小集）</div>
+<div style="font-size:12.5px;color:#555;line-height:2.1">· 一号一档<br>· 宣言敏感词过滤<br>· 举报 + 拉黑<br>· 私信限频<br>· 未成年不进恋爱池</div>
+</div>
+<div style="flex:1;min-width:300px;background:#fff;border:1px solid #e3e3e3;border-left:4px solid #ff5722;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.05);padding:16px 20px">
+<div style="font-size:14px;font-weight:800;color:#1a1a2e;margin-bottom:10px">待确认（按优先级）<span style="color:#e0571f">★</span></div>
+<div style="font-size:12px;color:#555;line-height:1.9">
+<div style="display:flex;gap:8px;margin-bottom:8px"><span style="color:#e0571f;font-weight:800">★</span><span><b>成年状态海外取数</b>——SEA 无国内实名体系，决定恋爱轨能否开，须先落实。</span></div>
+<div style="display:flex;gap:8px;margin-bottom:8px"><span style="color:#999;font-weight:800">·</span><span>50 级门槛是否合适（是否=满级 / 主线节点）。</span></div>
+<div style="display:flex;gap:8px;margin-bottom:8px"><span style="color:#999;font-weight:800">·</span><span>月老保底线条数、撮合权重、与自牵成的奖励差异。</span></div>
+<div style="display:flex;gap:8px;margin-bottom:8px"><span style="color:#999;font-weight:800">·</span><span>配额 N 数值 &amp; 周期与 1.2.4 版更对齐。</span></div>
+<div style="display:flex;gap:8px;margin-bottom:8px"><span style="color:#999;font-weight:800">·</span><span>美术资源：月老红线 IP、快照取图管线、分享卡模板。</span></div>
+<div style="display:flex;gap:8px"><span style="color:#999;font-weight:800">·</span><span>弹幕墙审核方式 + 端内同步技术可行性。</span></div>
+</div>
+</div>
+</div>
+
+<div style="text-align:center;margin-top:50px;padding-top:24px;border-top:1px solid #ddd;font-size:11.5px;color:#999">逆水寒 NA/SEA「暧昧加载，请勿退出」H5 · Ship or Swipe — 灰阶线框示意总览 · PRD v0.1（草案，待确认项见第八节）</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  componentDidMount() {
+    if (!document.getElementById('danmu-kf')) {
+      const s = document.createElement('style');
+      s.id = 'danmu-kf';
+      s.textContent = '@keyframes danmu{0%{transform:translateX(300px);}100%{transform:translateX(-105%);}}';
+      document.head.appendChild(s);
+    }
+  }
+}
+</script>
+</body>
+</html>
